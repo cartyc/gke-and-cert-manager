@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: demo-app
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    kubernetes.io/ingress.global-static-ip-name: "cert-manager-demo"
+spec:
+  tls:
+  - hosts:
+    - your.domain.com
+    secretName: demo-app-secret
+  rules:
+  - host: your.domain.com
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: hello-k8s-svc
+            port: 
+              number: 8080

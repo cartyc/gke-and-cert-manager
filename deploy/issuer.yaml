@@ -1,0 +1,35 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-name
+  namespace: demo-app
+spec:
+  secretName: example-com-tls
+  issuerRef:
+    name: letsencrypt-prod
+  commonName: your.domain.com
+  dnsNames:
+  - your.domain.com
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  namespace: demo-app
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: yourname@email.com # Update to yours
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      # Secret resource that will be used to store the account's private key.
+      name: demo-app-prod
+    # Add a single challenge solver, HTTP01 using nginx
+    solvers:
+    - selector: {}
+      http01:
+        ingress:
+          class: gce
