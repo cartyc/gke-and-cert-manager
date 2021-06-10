@@ -16,7 +16,7 @@ gcloud beta container clusters create $CLUSTER --enable-binauthz \
 --enable-stackdriver-kubernetes \
 --enable-private-nodes \
 --master-ipv4-cidr 172.16.0.32/28 \
---enable-dataplane-v2 --enable-master-authorized-networks --master-authorized-networks 24.52.218.194/32
+--enable-dataplane-v2 --enable-master-authorized-networks --master-authorized-networks youreip/32
 ```
 
 Create the NAT
