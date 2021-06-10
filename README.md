@@ -3,19 +3,28 @@ This is repo is meant to be for Demonstration purposes only.
 
 ## Create Kubernetes Cluster
 
+For this demo we'll create a Private GKE cluster to deploy our app and cert-manager too.
+
+First up lets set our environment variables.
+
 ```
 export PROJECT_ID=$(gcloud config get-value project)
 export NETWORK=knet # Name of Network to be Created
 export SUBNET=knet-subnet # Name of Subnet to be created
 export REGION=northamerica-northeast1-a # Montreal Region. Change to your preffered region.
+export MACHINE_TYPE=e2-standard-4 
 
 export CLUSTER=cert-manager
+```
 
+Now let's create the cluster
+
+```
 gcloud beta container clusters create $CLUSTER --enable-binauthz \
---machine-type e2-standard-4  --image-type cos_containerd --num-nodes 3 \
+--machine-type $MACHINE_TYPE  --image-type cos_containerd --num-nodes 3 \
 --enable-shielded-nodes --no-enable-basic-auth --enable-ip-alias --shielded-secure-boot \
 --workload-pool ${PROJECT_ID}.svc.id.goog --network $NETWORK --create-subnetwork name=${SUBNET} --zone $REGION \
---enable-dataplane-v2 \
+--enable-dataplane-v2 \ # Cilium Container Network
 --enable-stackdriver-kubernetes \
 --enable-private-nodes \ # Omit this line and the next two if you don't need a private cluster
 --master-ipv4-cidr 172.16.0.32/28 \
@@ -23,6 +32,8 @@ gcloud beta container clusters create $CLUSTER --enable-binauthz \
 ```
 
 ## Create the NAT (Ignore if you aren't using a private cluster)
+
+Creating the NAT will allow outbound internet connections so you will be able to download the required containers.
 ```
 gcloud compute routers create nat-router \
     --network $NETWORK \
@@ -36,6 +47,9 @@ gcloud compute routers nats create nat-config \
 ```
 
 ## Install Cert-Manager
+
+More detailed installation options can be found in the cert-manager [docs](https://cert-manager.io/docs/installation/kubernetes/).
+
 ```
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml
 ```
